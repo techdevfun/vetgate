@@ -1,0 +1,1 @@
+{"mcpServers":{"vetgate":{"args":["-y","vetgate","serve"],"command":"npx"}}}

