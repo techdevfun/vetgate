@@ -357,9 +357,19 @@ export function vetPackageContents(
     );
   }
 
-  // Scanned .js / .sh file contents passed in files.
+  // Scanned JavaScript / shell file contents passed in files. .mjs and
+  // .cjs are real JavaScript modules Node executes (dual ESM/CJS
+  // packages commonly ship them as entry points), so they are scanned
+  // exactly like .js: the same payload in index.mjs must not slip past
+  // the gate just because of its extension.
   for (const filename of Object.keys(files).sort()) {
-    if (!filename.endsWith(".js") && !filename.endsWith(".sh")) continue;
+    if (
+      !filename.endsWith(".js") &&
+      !filename.endsWith(".mjs") &&
+      !filename.endsWith(".cjs") &&
+      !filename.endsWith(".sh")
+    )
+      continue;
     findings.push(...scanScriptText(files[filename], "file-exfil"));
   }
 
