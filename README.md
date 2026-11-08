@@ -92,7 +92,7 @@ in [docs/RULES.md](docs/RULES.md). Summary:
 
 DENY:
 
-- Install script, scanned `.js` / `.sh` file, or remote script text that
+- Install script, scanned `.js` / `.mjs` / `.cjs` / `.sh` file, or remote script text that
   reads a credential or environment value AND sends data to the network
   in the same text.
 - Download-and-execute chains: `curl|sh`, `curl|bash`, `wget|sh`,
