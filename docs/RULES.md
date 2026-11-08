@@ -44,7 +44,7 @@ A credential or environment read AND a network send in the same text.
   or any `http://` / `https://` URL.
 - Surfaces: `install-script-exfil` for `preinstall` / `install` /
   `postinstall` / `prepare` entries in `package.json`; `file-exfil` for
-  scanned `.js` / `.sh` file contents passed in `files`; `script-exfil`
+  scanned `.js` / `.mjs` / `.cjs` / `.sh` file contents passed in `files`; `script-exfil`
   for remote script text.
 - Triggering fixture: postinstall reading `process.env.NPM_TOKEN` and
   posting it with `fetch` to an outbound URL.
