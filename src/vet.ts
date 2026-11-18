@@ -109,9 +109,14 @@ const NETWORK_SEND_PATTERNS: RegExp[] = [
 
 const OUTBOUND_URL_PATTERN = /https?:\/\/[^\s'"`)]+/;
 
-// Download-and-execute chains.
+// Download-and-execute chains. The executor after the pipe may be a bare
+// name (sh), an absolute or relative path (/bin/sh, ./sh), or wrapped in
+// sudo/env: all of those run the downloaded bytes the same way, so they
+// must match too. A bare `curl ... | sh` and `curl ... | /bin/sh` are the
+// same attack; only the spelling differs.
 const DOWNLOAD_EXECUTE_PATTERNS: RegExp[] = [
-  /(?:\bcurl\b|\bwget\b)[^|\n\r]*\|\s*(?:sh|bash|node)\b/,
+  /(?:\bcurl\b|\bwget\b)[^|\n\r]*\|\s*(?:sudo\s+)?(?:[^\s|]*\/)?(?:sh|bash|node)\b/,
+  /(?:\bcurl\b|\bwget\b)[^|\n\r]*\|\s*(?:sudo\s+)?(?:[^\s|]*\/)?env\s+(?:sh|bash|node)\b/,
   /powershell\b[^;\n\r]*\bIEX\b[^;\n\r]*https?:\/\//i,
   /powershell\b[^;\n\r]*https?:\/\/[^;\n\r]*\bIEX\b/i,
 ];
