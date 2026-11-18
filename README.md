@@ -97,6 +97,7 @@ DENY:
   in the same text.
 - Download-and-execute chains: `curl|sh`, `curl|bash`, `wget|sh`,
   `wget|bash`, `curl|node`, PowerShell `IEX` with an `http(s)` URL.
+  The executor may also be a path (`/bin/sh`) or wrapped in `sudo`/`env`.
 - Obfuscation markers (`eval(atob(`, base64-then-`eval`,
   `String.fromCharCode` with 10+ arguments, dense `\x` hex escapes)
   combined with a network call.
